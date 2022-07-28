@@ -5,55 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-public class Main {
-    public static void main(String[] args) {
-        Game game = new Game();
-        game.start();
-    }
-}
-
-class Game {
-    private int turn = 1;
-
-    protected int start() {
-        int length = UserInteraction.sendNumOfLength();
-        if (length == 0 || length > 36) {
-            return -1;
-        }
-        int symbols = UserInteraction.sendNumOfSymbols();
-        if (symbols == 0 || symbols < length || symbols > 36) {
-            System.out.printf("Error: it's not possible to generate a code with a length of %d with %d unique symbols.\n", length, symbols);
-            return -1;
-        }
-
-        char[] secretCode = UserInteraction.generateNewCode(length, symbols);
-        UserInteraction.preparedMessage(length, symbols);
-        System.out.println("Okay, let's start a game!");
-
-        int result = 0;
-        do {
-            result = guess(secretCode);
-        }
-        while (result != 1);
-        return 1;
-    }
-
-    protected int guess(char[] secretCode) {
-        System.out.printf("Turn %d:\n", this.turn);
-        char[] playerCode = UserInteraction.sendCode(secretCode.length);
-        char[] tmpCode = secretCode.clone();
-        int bulls = UserInteraction.checkBulls(tmpCode, playerCode);
-        int cows = UserInteraction.checkCows(tmpCode, playerCode);
-        if (UserInteraction.sendResult(playerCode.length, cows, bulls) == 1) {
-            System.out.println("Congratulations! You guessed the secret code.");
-            return 1;
-        }
-        this.turn++;
-        return 0;
-    }
-}
-
-class UserInteraction {
+public class UserInteraction {
 
     protected static int sendNumOfLength() {
         System.out.println("Input the length of the secret code:");
@@ -90,7 +42,7 @@ class UserInteraction {
             } else {
                 return length;
             }
-        } catch (IOException e) {
+        } catch (IOException | NumberFormatException e) {
             return 0;
         }
     }
@@ -183,7 +135,7 @@ class UserInteraction {
         for (int i = 0; i < secretCode.length; i++) {
             if (secretCode[i] == playerCode[i]) {
                 playerCode[i] = 58;
-                secretCode[i] = 58;
+                secretCode[i] = 59;
                 count++;
             }
         }
